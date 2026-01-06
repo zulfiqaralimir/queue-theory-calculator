@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Theory Staffing Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Crimson+Pro:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2d5016;
+            --primary-light: #4a7c2a;
+            --secondary: #d4a574;
+            --accent: #e8b86d;
+            --bg: #f8f6f0;
+            --text: #2c2c2c;
+            --text-light: #6b6b6b;
+            --card: #ffffff;
+            --shadow: rgba(45, 80, 22, 0.1);
+            --shadow-lg: rgba(45, 80, 22, 0.15);
+        }
+        
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(45, 80, 22, 0.02) 100px,
+                    rgba(45, 80, 22, 0.02) 102px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            font-weight: 300;
+        }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 
+                0 4px 6px var(--shadow),
+                0 1px 3px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 24px var(--shadow-lg),
+                0 4px 8px var(--shadow);
+            border-color: var(--accent);
+        }
+        
+        .card h2 {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .label-helper {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 400;
+            display: block;
+            margin-top: 0.25rem;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            font-family: 'Space Mono', monospace;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+        }
+        
+        /* Button */
+        .btn-calculate {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            font-family: 'Space Mono', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-calculate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-calculate:hover::before {
+            left: 100%;
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--shadow-lg);
+        }
+        
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+        
+        /* Results Card */
+        .results-card {
+            grid-column: 1 / -1;
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .results-card.show {
+            display: block;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .metric:hover {
+            border-left-width: 8px;
+            padding-left: 1.75rem;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .metric-unit {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-left: 0.25rem;
+        }
+        
+        /* Staff Comparison Table */
+        .staff-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        .staff-table thead {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .staff-table th {
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .staff-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        
+        .staff-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        
+        .staff-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .staff-table tbody tr {
+            background: white;
+            transition: background 0.2s ease;
+        }
+        
+        .staff-table tbody tr:hover {
+            background: var(--bg);
+        }
+        
+        .staff-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 8px;
+        }
+        
+        .staff-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 8px 0;
+        }
+        
+        .staff-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .optimal-row {
+            background: rgba(45, 80, 22, 0.05) !important;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+        
+        .badge-success {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        .badge-warning {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .badge-danger {
+            background: #c44536;
+            color: white;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.05), rgba(212, 165, 116, 0.05));
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        
+        .info-box h3 {
+            font-family: 'Space Mono', monospace;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .info-box p {
+            color: var(--text);
+            line-height: 1.8;
+        }
+        
+        /* Examples Section */
+        .examples {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+        }
+        
+        .examples h2 {
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .example-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .example-card h3 {
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .example-card p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin: 0.5rem 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Stagger animation delays */
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .staff-table {
+                font-size: 0.85rem;
+            }
+            
+            .staff-table th,
+            .staff-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Loading State */
+        .calculating {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .btn-calculate.loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⏱️ Queue Theory Calculator</h1>
+            <p class="subtitle">Optimize your staffing with stochastic modeling</p>
+        </header>
+        
+        <div class="main-grid">
+            <!-- Input Card -->
+            <div class="card">
+                <h2>📊 Your Business Data</h2>
+                <form id="queueForm">
+                    <div class="form-group">
+                        <label for="arrivalRate">
+                            Customer Arrival Rate
+                            <span class="label-helper">Average customers per hour</span>
+                        </label>
+                        <input type="number" id="arrivalRate" min="1" step="1" value="40" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceRate">
+                            Service Rate
+                            <span class="label-helper">Customers one employee serves per hour</span>
+                        </label>
+                        <input type="number" id="serviceRate" min="1" step="1" value="20" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetWait">
+                            Target Wait Time
+                            <span class="label-helper">Maximum acceptable wait (minutes)</span>
+                        </label>
+                        <input type="number" id="targetWait" min="1" step="0.5" value="5" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-calculate">Calculate Optimal Staffing</button>
+                </form>
+            </div>
+            
+            <!-- Quick Info Card -->
+            <div class="card">
+                <h2>ℹ️ How It Works</h2>
+                <p style="margin-bottom: 1rem;">
+                    This calculator uses the <strong>M/M/c queue model</strong> (Erlang C formula) to determine optimal staffing levels.
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    <strong>Stochastic modeling</strong> means it accounts for the random, unpredictable nature of customer arrivals.
+                </p>
+                <p>
+                    The algorithm calculates the minimum staff needed to prevent infinite queues, then finds the optimal number to meet your wait time target.
+                </p>
+            </div>
+            
+            <!-- Results Card -->
+            <div class="card results-card" id="resultsCard">
+                <h2>🎯 Your Results</h2>
+                
+                <div class="results-grid">
+                    <div class="metric">
+                        <div class="metric-label">Optimal Staffing</div>
+                        <div class="metric-value">
+                            <span id="optimalStaff">-</span>
+                            <span class="metric-unit">employees</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Expected Wait Time</div>
+                        <div class="metric-value">
+                            <span id="waitTime">-</span>
+                            <span class="metric-unit">min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Staff Utilization</div>
+                        <div class="metric-value">
+                            <span id="utilization">-</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Chance of Waiting</div>
+                        <div class="metric-value">
+                            <span id="probWait">-</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="font-family: 'Space Mono', monospace; margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">
+                    📈 Staffing Scenarios Comparison
+                </h3>
+                
+                <div style="overflow-x: auto;">
+                    <table class="staff-table" id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>Staff</th>
+                                <th>Wait Time</th>
+                                <th>Utilization</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box">
+                    <h3>💡 Recommendation</h3>
+                    <p id="recommendation"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Examples Section -->
+        <div class="examples">
+            <h2>Try These Examples</h2>
+            <div class="example-grid">
+                <div class="example-card" onclick="loadExample(40, 20, 5)">
+                    <h3>☕ Coffee Shop</h3>
+                    <p>📥 40 customers/hour</p>
+                    <p>⚡ 20 served/hour per barista</p>
+                    <p>⏱️ 5 min target wait</p>
+                </div>
+                
+                <div class="example-card" onclick="loadExample(25, 12, 5)">
+                    <h3>🏦 Bank Branch</h3>
+                    <p>📥 25 customers/hour</p>
+                    <p>⚡ 12 served/hour per teller</p>
+                    <p>⏱️ 5 min target wait</p>
+                </div>
+                
+                <div class="example-card" onclick="loadExample(100, 12, 3)">
+                    <h3>📞 Call Center</h3>
+                    <p>📥 100 calls/hour</p>
+                    <p>⚡ 12 calls/hour per agent</p>
+                    <p>⏱️ 3 min target wait</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Queue Theory Calculations
+        function factorial(n) {
+            if (n <= 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+        
+        function calculateMinServers(arrivalRate, serviceRate) {
+            return Math.ceil(arrivalRate / serviceRate);
+        }
+        
+        function calculateTrafficIntensity(arrivalRate, serviceRate, numServers) {
+            return arrivalRate / (numServers * serviceRate);
+        }
+        
+        function calculateP0(arrivalRate, serviceRate, numServers) {
+            const rho = arrivalRate / serviceRate;
+            const trafficIntensity = calculateTrafficIntensity(arrivalRate, serviceRate, numServers);
+            
+            let sum = 0;
+            for (let n = 0; n < numServers; n++) {
+                sum += Math.pow(rho, n) / factorial(n);
+            }
+            
+            const lastTerm = Math.pow(rho, numServers) / (factorial(numServers) * (1 - trafficIntensity));
+            
+            return 1 / (sum + lastTerm);
+        }
+        
+        function calculateErlangC(arrivalRate, serviceRate, numServers) {
+            const rho = arrivalRate / serviceRate;
+            const trafficIntensity = calculateTrafficIntensity(arrivalRate, serviceRate, numServers);
+            const p0 = calculateP0(arrivalRate, serviceRate, numServers);
+            
+            return (Math.pow(rho, numServers) * p0) / (factorial(numServers) * (1 - trafficIntensity));
+        }
+        
+        function calculateWaitTime(arrivalRate, serviceRate, numServers) {
+            const erlangC = calculateErlangC(arrivalRate, serviceRate, numServers);
+            const trafficIntensity = calculateTrafficIntensity(arrivalRate, serviceRate, numServers);
+            
+            const waitTimeHours = erlangC / (numServers * serviceRate * (1 - trafficIntensity));
+            return waitTimeHours * 60; // Convert to minutes
+        }
+        
+        function analyzeStaffing(arrivalRate, serviceRate, targetWaitMinutes) {
+            const minServers = calculateMinServers(arrivalRate, serviceRate);
+            const scenarios = [];
+            let optimal = null;
+            
+            for (let numServers = minServers; numServers <= minServers + 10; numServers++) {
+                const trafficIntensity = calculateTrafficIntensity(arrivalRate, serviceRate, numServers);
+                
+                if (trafficIntensity >= 1) continue;
+                
+                try {
+                    const waitTime = calculateWaitTime(arrivalRate, serviceRate, numServers);
+                    const erlangC = calculateErlangC(arrivalRate, serviceRate, numServers);
+                    
+                    const scenario = {
+                        numServers,
+                        waitTime: waitTime.toFixed(2),
+                        utilization: (trafficIntensity * 100).toFixed(1),
+                        probWait: (erlangC * 100).toFixed(1),
+                        meetsTarget: waitTime <= targetWaitMinutes
+                    };
+                    
+                    scenarios.push(scenario);
+                    
+                    if (!optimal && waitTime <= targetWaitMinutes) {
+                        optimal = scenario;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            return { optimal, scenarios, minServers };
+        }
+        
+        // UI Functions
+        function loadExample(arrival, service, target) {
+            document.getElementById('arrivalRate').value = arrival;
+            document.getElementById('serviceRate').value = service;
+            document.getElementById('targetWait').value = target;
+            
+            // Scroll to form
+            document.getElementById('queueForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function displayResults(results) {
+            const resultsCard = document.getElementById('resultsCard');
+            const optimal = results.optimal;
+            
+            if (!optimal) {
+                alert('Could not find optimal staffing. Try adjusting your parameters.');
+                return;
+            }
+            
+            // Update metrics
+            document.getElementById('optimalStaff').textContent = optimal.numServers;
+            document.getElementById('waitTime').textContent = optimal.waitTime;
+            document.getElementById('utilization').textContent = optimal.utilization;
+            document.getElementById('probWait').textContent = optimal.probWait;
+            
+            // Update table
+            const tbody = document.getElementById('staffTableBody');
+            tbody.innerHTML = '';
+            
+            results.scenarios.forEach(scenario => {
+                const row = document.createElement('tr');
+                if (scenario.numServers === optimal.numServers) {
+                    row.classList.add('optimal-row');
+                }
+                
+                let badge = '';
+                if (scenario.meetsTarget) {
+                    badge = '<span class="badge badge-success">✓ Meets Target</span>';
+                } else if (parseFloat(scenario.waitTime) <= parseFloat(scenario.waitTime) * 1.5) {
+                    badge = '<span class="badge badge-warning">Close</span>';
+                } else {
+                    badge = '<span class="badge badge-danger">Too Slow</span>';
+                }
+                
+                row.innerHTML = `
+                    <td><strong>${scenario.numServers}</strong></td>
+                    <td>${scenario.waitTime} min</td>
+                    <td>${scenario.utilization}%</td>
+                    <td>${badge}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Update recommendation
+            const recommendation = document.getElementById('recommendation');
+            const util = parseFloat(optimal.utilization);
+            let message = `With <strong>${optimal.numServers} employees</strong>, you'll maintain an average wait time of <strong>${optimal.waitTime} minutes</strong>. `;
+            
+            if (util < 70) {
+                message += 'Your staff will have some idle time, which is good for service quality and handling unexpected surges.';
+            } else if (util < 85) {
+                message += 'Your staff will be efficiently utilized with a balanced workload.';
+            } else {
+                message += 'Your staff will be very busy. Consider adding buffer staff during peak periods.';
+            }
+            
+            recommendation.innerHTML = message;
+            
+            // Show results
+            resultsCard.classList.add('show');
+            resultsCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Form submission
+        document.getElementById('queueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const arrivalRate = parseFloat(document.getElementById('arrivalRate').value);
+            const serviceRate = parseFloat(document.getElementById('serviceRate').value);
+            const targetWait = parseFloat(document.getElementById('targetWait').value);
+            
+            // Validate
+            if (arrivalRate <= 0 || serviceRate <= 0 || targetWait <= 0) {
+                alert('Please enter positive values for all fields.');
+                return;
+            }
+            
+            // Calculate
+            const btn = document.querySelector('.btn-calculate');
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                const results = analyzeStaffing(arrivalRate, serviceRate, targetWait);
+                displayResults(results);
+                
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
