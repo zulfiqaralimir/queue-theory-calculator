@@ -349,11 +349,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+**Zulfiqar Ali Mir**
+- GitHub: [@zulfiqaralimir](https://github.com/zulfiqaralimir/queue-theory-calculator.git)
+- LinkedIn: [Your Profile](https://www.linkedin.com/in/zulfiqar-ali-mir/)
 - Portfolio: [your-website.com](https://your-website.com)
-- Email: your.email@example.com
+- Email: manager.equity.finance@gmail.com
 
 ---
 
