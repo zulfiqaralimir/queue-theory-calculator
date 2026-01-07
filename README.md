@@ -7,7 +7,8 @@
 
 > A comprehensive staffing optimization tool using queue theory (M/M/c model) to help businesses determine optimal staffing levels based on stochastic customer arrival patterns.
 
-[🌐 Live Demo](https://your-demo-link.com) | [📱 Android App](https://play.google.com/store/apps) | [📖 Documentation](./docs)
+🌐 Live Demo | [📱 Android App](✅ Built - Ready for Play Store) | 📖 Documentation
+
 
 ---
 
@@ -434,6 +435,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/queue-theory-calculator)
 ![GitHub code size](https://img.shields.io/github/languages/code-size/yourusername/queue-theory-calculator)
 
+
+## 🎉 Latest Updates
+
+   - ✅ **January 7, 2026** - Android APK built successfully (44.7 MB)
+   - ✅ Web app deployed on Vercel
+   - ✅ Full GitHub repository with documentation
+   - 🚀 Ready for Google Play Store submission
 ---
 
 <div align="center">
